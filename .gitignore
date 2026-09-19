@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output and tooling caches
+dist/
+build/
+.vite/
+.cache/
+*.tsbuildinfo
+
+# Local debug logs
+.manus-logs/
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# Test and coverage output
+coverage/
+playwright-report/
+test-results/
+
+# Netlify local state
+.netlify/

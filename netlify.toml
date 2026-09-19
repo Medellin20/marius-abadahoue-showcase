@@ -1,0 +1,41 @@
+[build]
+  command = "pnpm run build:netlify"
+  publish = "dist/public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_FLAGS = "--frozen-lockfile"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["express"]
+
+# API and image requests must reach the function before the SPA fallback.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/manus-storage/*"
+  to = "/.netlify/functions/api/manus-storage/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[dev]
+  command = "pnpm run dev"
+  targetPort = 3000
+  port = 8888
+  autoLaunch = false
