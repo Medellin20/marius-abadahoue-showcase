@@ -5,6 +5,7 @@ import { bookingSchema, goals, levels, timeSlots, todayInBenin } from "@shared/b
 const inputClass = "mt-2 w-full rounded-sm border border-white/25 bg-[#171619] px-3 py-3 text-base text-[#fff8f0] focus:border-[#f4c660] focus:outline-none focus:ring-1 focus:ring-[#f4c660]";
 export default function BookingForm() {
   const [pending, setPending] = useState(false);
+  const [consent, setConsent] = useState(false);
   const submitting = useRef(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -13,7 +14,7 @@ export default function BookingForm() {
   const attrs = (name: string) => ({ name, id: name, "aria-invalid": !!fields[name], "aria-describedby": fields[name] ? `${name}-error` : undefined });
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting.current) return;
+    if (submitting.current || !consent) return;
     const values = new FormData(event.currentTarget);
     const parsed = bookingSchema.safeParse({ ...Object.fromEntries(values), consent: values.get("consent") === "on" });
     setError(""); setFields({});
@@ -56,9 +57,9 @@ export default function BookingForm() {
           <label className="text-sm sm:col-span-2" htmlFor="availability">Disponibilités pour le suivi régulier *<textarea {...attrs("availability")} required minLength={2} maxLength={500} rows={2} placeholder="Ex. : lundi et mercredi après 18 h, deux séances par semaine." className={inputClass} />{fieldError("availability")}</label>
           <label className="text-sm sm:col-span-2" htmlFor="notes">Précisions (facultatif)<textarea {...attrs("notes")} maxLength={1500} rows={3} placeholder="Vos attentes, vos habitudes sportives ou vos questions pour le coach." className={inputClass} /><span className="mt-2 block text-xs text-[#d6cbc2]">Les informations médicales pourront être abordées directement avec le coach lors de la visite.</span>{fieldError("notes")}</label>
           <div className="hidden" aria-hidden="true"><label>Site web<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
-          <div className="sm:col-span-2"><label className="flex items-start gap-3 text-sm leading-6"><input {...attrs("consent")} type="checkbox" required className="mt-1 h-4 w-4 shrink-0 accent-[#9b2d35]" />J’accepte que ces informations soient transmises par e-mail à l’équipe coaching pour traiter ma demande et me recontacter.</label>{fieldError("consent")}</div>
+          <div className="sm:col-span-2"><label className="flex items-start gap-3 text-sm leading-6"><input {...attrs("consent")} type="checkbox" checked={consent} onChange={event => setConsent(event.target.checked)} required className="mt-1 h-4 w-4 shrink-0 accent-[#9b2d35]" />J’accepte que ces informations soient transmises par e-mail à l’équipe coaching pour traiter ma demande et me recontacter.</label>{fieldError("consent")}</div>
           {error && <p role="alert" className="border border-[#f4c660]/50 p-3 text-sm text-[#f4c660] sm:col-span-2">{error}</p>}
-          <button type="submit" className="flex items-center justify-center gap-3 bg-[#9b2d35] px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider hover:bg-[#bc3943] disabled:cursor-wait sm:col-span-2">{pending ? <><Loader2 className="h-4 w-4 animate-spin" />Envoi en cours…</> : <>Demander ma visite coaching <ArrowRight className="h-4 w-4" /></>}</button>
+          <button type="submit" disabled={!consent || pending} className="flex items-center justify-center gap-3 bg-[#9b2d35] px-5 py-4 font-mono text-xs font-bold uppercase tracking-wider enabled:hover:bg-[#bc3943] disabled:cursor-not-allowed disabled:bg-[#51494c] disabled:text-[#c9bfb7] sm:col-span-2">{pending ? <><Loader2 className="h-4 w-4 animate-spin" />Envoi en cours…</> : <>Demander ma visite coaching <ArrowRight className="h-4 w-4" /></>}</button>
         </fieldset>
       </form>}
     </div>
